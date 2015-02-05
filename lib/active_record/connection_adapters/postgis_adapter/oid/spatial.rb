@@ -76,6 +76,15 @@ module ActiveRecord
               .generate(geo_value)
           end
 
+          def binary?(*args)
+            if args.size == 0
+              false
+            else
+              string = args[0]
+              string[0] == "\x00" || string[0] == "\x01" || string[0, 4] =~ /[0-9a-fA-F]{4}/
+            end
+          end
+
           private
 
           def type_cast(value)
@@ -98,10 +107,6 @@ module ActiveRecord
             wkt_parser(factory, string).parse(string)
           rescue RGeo::Error::ParseError
             nil
-          end
-
-          def binary?(string)
-            string[0] == "\x00" || string[0] == "\x01" || string[0, 4] =~ /[0-9a-fA-F]{4}/
           end
 
           def wkt_parser(factory, string)
